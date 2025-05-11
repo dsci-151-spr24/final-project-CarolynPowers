@@ -1,6 +1,6 @@
-Project title
+Game and Grade 
 ================
-by your name
+by Carolyn Powers 
 
 ## Summary
 
