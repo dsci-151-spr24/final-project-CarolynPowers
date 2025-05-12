@@ -1,23 +1,55 @@
 ---
-title: "Project proposal"
-author: "Your name"
-output: github_document
+title: "Game and Grade"
+author: "Carolyn Powers"
+output: 
 ---
+  
+```{r}
+#| label: load-packages
+#| warning: false
+#| message: false
 
-```{r load-packages, message = FALSE}
+# library(skimr)
 library(tidyverse)
-library(broom)
+library(dplyr)
+library(ggplot2)
+```
+  
+  ***Do video games affect the success of grades?***
+  
+Sex: The student's gender ('Female' or 'Male').
+
+School Code: The code representing the student's school, which is a unique identifier for each school.
+
+Playing Years: The number of years the student has been playing games.
+
+Playing Often: A rating of how often the student plays games, likely on a scale from 1 to 5.
+
+Playing Hours: The number of hours the student spends playing games per day.
+
+Playing Games: The number of types of games the student plays (e.g., 0: not playing games, 1: playing games).
+
+Parent Revenue: The annual income of the student's family.
+
+Father Education: The education level of the student's father.
+
+Mother Education: The education level of the student's mother.
+
+Grade: The student's academic grade.
+
+```{r}
+#| label: sourcedata
+#| eval: false
+
+# From Kaggle: https://www.kaggle.com/datasets/deadier/play-games-and-success-in-students
+gameandgrade <- read_csv(file = "data/gameandgrade.csv")
+gameandgrade
 ```
 
-## 1. Introduction
+```{r eval=FALSE}
+#| label: gameandgrade-glimpse
 
+glimpse(gameandgrade)
+```
 
-
-## 2. Data
-
-
-
-## 3. Data analysis plan
-
-
-
+The outcome for this project will be grades and the predictor will be the amount of time spend playing video games.  My hypothesis is that the more video games that are played, the worse the grades will become.  The data includes parent revenue and the education levels of the parents.  I will explore how these factors may influence the outcome of the grades.  I believe that methods such as 'if then' statements will help me come to a final conclusion.  In order for my hypothesized answer to be correct, the data will need to show a decrease in grades in correlation with the amount of video games played. 

@@ -1,12 +1,12 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle (if any)"
-author: "Your Name"
+title: "Game and Grade"
+subtitle: "Do Video Games Impact Academic Performance"
+author: "Carolyn Powers"
 institute: "Houghton University"
-date: "`r Sys.Date()`"
+date: "5/15/25"
 output:
   xaringan::moon_reader:
-    css: xaringan-themer.css
+    css: custom-theme.css
     lib_dir: libs
     nature:
       ratio: "16:9"
@@ -22,6 +22,8 @@ library(tidymodels)
 library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
+library(dplyr)
+library(ggplot2)
 ```
 
 ```{r setup, include=FALSE}
@@ -30,174 +32,180 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```
 
 ```{r load-data, include=FALSE}
-# Load your data here
+#| label: sourcedata
+
+# From Kaggle: https://www.kaggle.com/datasets/deadier/play-games-and-success-in-students
+gameandgrade <- read_csv(file = "data/gameandgrade.csv")
+gameandgrade
 ```
 
-```{r}
+```{r, include=FALSE}
+#Xaringan image for slides 
 style_xaringan(
-  title_slide_background_image = "img/confetti.jpg"
+  title_slide_background_image = "img/controllerBackground.jpg",
+  background_image = "img/controllerBackground.jpg"
 )
 ```
 
+class: top, left
 
-class: center, middle
-
-## A statement of the overall goal / research question
-
----
-
-class: inverse, center, middle
-
-# Section title
-
----
-
-# Hello World
-
-- Click the `Knit` button to compile your presentation
-
-- Make sure to commit and push all resulting files to your GitHub repo
-
----
-
-class: inverse, middle, center
-
-# Using xaringan
-
----
-
-# xaringan
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
+#Limitations
 
 --
 
-- Like this
+##-Frequency 
+##-"Good Games"
 
 ---
 
-# Layouts
+```{r, echo=FALSE, include=FALSE}
+#looked up how to change a column to numbers, it had NAs, so looked up how to remove them.
+  gameandgrade$Grade <- gsub("[^0-9.]", "", gameandgrade$Grade)
+  gameandgrade$Grade <- as.numeric(gameandgrade$Grade)
+```
 
-You can use plain text
+```{r, echo=FALSE, include=FALSE}
+#the average score of the schools we are looking at, all are schools that if you round up are 70 or above.
+gameOrNotGameGrades <- gameandgrade %>%
+  filter(`Playing Games` != "2") %>%
+  group_by(`Playing Games`) %>%
+  summarise(`Average Score` = mean(Grade, na.rm = TRUE))
+```
 
-- or bullet points
+#Number of schools and their Grades
 
-.pull-left[
-or text in two columns $^*$
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
-
----
-
-# Code
-
-```{r boring-regression}
-# a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
+```{r, echo=FALSE}
+#Helpful code to make slides look better
+knitr::kable(gameOrNotGameGrades, align = 'l')
 ```
 
 ---
 
-# Plots
-
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-iris_modified <- iris %>%
-  mutate(Species = fct_other(Species, keep = "setosa"))
+```{r, echo=FALSE, include=FALSE}
+#Average score of schools based on school code/summarizing, adding mean
+averageScoreofSchools <- gameandgrade %>%
+  filter(`Playing Games` == "1") %>%
+  group_by(`School Code`) %>%
+  summarize(`Average Score` = mean(Grade, na.rm = TRUE))
 ```
 
-```{r plot-iris, echo = FALSE}
-# Code hidden with echo = FALSE
-# Uses modified iris dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(data = iris_modified, mapping = aes(x = Sepal.Width, y = Sepal.Length, color = Species)) +
-  geom_point() + 
-  theme_minimal() # theme options: https://ggplot2.tidyverse.org/reference/ggtheme.html
+#Number of schools and their Grades
+
+```{r, echo=FALSE}
+#Adding slide coding, the average grade of students who play video games in their respective schools
+knitr::kable(averageScoreofSchools, align = 'l')
 ```
 
 ---
 
-## Plot and text
+```{r, echo=FALSE}
+#Playing hours special characters 
+  gameandgrade$`Playing Hours` <- gsub("[^0-9.]", "", gameandgrade$`Playing Hours`)
+  gameandgrade$`Playing Hours` <- as.numeric(gameandgrade$`Playing Hours`)
+```
 
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-ggplot(penguins, aes(x = bill_length_mm, y = species, color = species)) +
-  geom_boxplot() +
+```{r, echo=FALSE, include=FALSE}
+#Seeing playing hours variable/finding acerage score
+gameandgrade %>%
+  group_by(`Playing Hours`) %>%
+  summarise(averageScore = mean(`Grade`, na.rm = TRUE))
+```
+
+```{r, echo=FALSE}
+#Vizualizing data found
+gameandgrade %>%
+  group_by(`Playing Hours`) %>%
+  summarise(averageScore = mean(`Grade`, na.rm = TRUE)) %>%
+  ggplot(aes(x = `Playing Hours`, y = averageScore, fill = `Playing Hours`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Average Score based on hours played per day", x = "Hours Played", y = "Average Grades") +
   theme_minimal()
 ```
-]
 
 ---
 
-# Tables
+```{r, echo=FALSE}
+#Boys play more on average
+gameandgrade %>%
+  group_by(`Sex`) %>%
+  summarise(averageScore = mean(`Playing Hours`, na.rm = TRUE))
+```
 
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r iris-table, echo = FALSE}
-kable(head(iris), format = "html")
+```{r, echo=FALSE}
+#Girls on average have a higher Grade score
+gameandgrade %>%
+  group_by(`Sex`) %>%
+  summarise(averageScore = mean(`Grade`, na.rm = TRUE))
 ```
 
 ---
 
-# Images
-
-```{r castle, echo = FALSE, out.width = "60%", fig.align = "center", fig.cap = "Image credit: Photo by Jörg Angeli on Unsplash."}
-include_graphics("https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80")
+```{r, echo=FALSE}
+#Converting parents education from a string
+  gameandgrade$`Father Education` <- gsub("[^0-9.]", "", gameandgrade$`Father Education`)
+  gameandgrade$`Father Education` <- as.numeric(gameandgrade$`Father Education`)
+  gameandgrade$`Mother Education` <- gsub("[^0-9.]", "", gameandgrade$`Mother Education`)
+  gameandgrade$`Mother Education` <- as.numeric(gameandgrade$`Mother Education`)
 ```
 
-Or you can also include a full page image. See next slide.
+```{r, echo=FALSE}
+#Combining parent education 
+gameandgrade <- gameandgrade %>%
+mutate(combinedParentEduc = `Father Education` + `Mother Education`)
+```
+
+```{r, echo=FALSE}
+#Violin Chart
+gameandgrade %>%
+  group_by(combinedParentEduc) %>%
+  summarise(averageScore = mean(`Grade`, na.rm = TRUE)) %>%
+  ggplot(aes(x = combinedParentEduc, y = averageScore)) +
+  geom_violin(fill = "skyblue", color = "black") +
+  labs(title = "1", x = "2", y = "3")
+```
 
 ---
 
-background-image: url(https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80)
+```{r, echo=FALSE}
+#Bar Graph2
+gameandgrade %>%
+  filter(combinedParentEduc != 0 & combinedParentEduc != 1) %>%
+  group_by(combinedParentEduc) %>%
+  summarise(averageScore = mean(`Grade`, na.rm = TRUE)) %>%
+  ggplot(aes(x = combinedParentEduc, y = averageScore, fill = combinedParentEduc)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Average Score based on hours played per day", x = "Combined Parent Education Score", y = "Average Grades") +
+  theme_minimal()
+```
+ 
+---
+
+```{r, echo=FALSE}
+#Bar Graph no2
+gameandgrade %>%
+    filter(combinedParentEduc != 0 & combinedParentEduc != 1 & combinedParentEduc != 2) %>%
+  group_by(combinedParentEduc) %>%
+  summarise(averageScore = mean(`Playing Hours`, na.rm = TRUE)) %>%
+  ggplot(aes(x = combinedParentEduc, y = averageScore, fill = combinedParentEduc)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Do more educated parents allow their children to play less?", x = "Combined Parent Education Score", y = "Average Daily Hours") +
+  theme_minimal()
+```
 
 ---
 
-# Math Expressions
+Other stuff we need:
 
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
+Add own images 
 
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
+fix slides (knitr::kable) makes them pretty 
 
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+game and grade average score of schools 
 
-Limitations:
+make more slides 
 
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
+fix outlier lines 138-147
 
-1. There should not be spaces after the opening `$` or before the closing `$`.
 
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-# Feeling adventurous?
-
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
-
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
-
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
-
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
+Works Cited
+Games and success in students. (2025, February 19). Kaggle. https://www.kaggle.com/datasets/deadier/play-games-and-success-in-students
