@@ -47,6 +47,30 @@ style_xaringan(
 )
 ```
 
+<span style="color: white;">
+Sex: The student's gender ('Female' or 'Male').
+<span style="color: white;">
+
+School Code: The code representing the student's school, which is a unique identifier for each school.
+
+Playing Years: The number of years the student has been playing games.
+
+Playing Often: A rating of how often the student plays games, likely on a scale from 1 to 5.
+
+Playing Hours: The number of hours the student spends playing games per day.
+
+Playing Games: The number of types of games the student plays (e.g., 0: not playing games, 1: playing games).
+
+Parent Revenue: The annual income of the student's family.
+
+Father Education: The education level of the student's father.
+
+Mother Education: The education level of the student's mother.
+
+Grade: The student's academic grade.
+</span>
+---
+
 class: top, left
 
 #Limitations
@@ -192,9 +216,30 @@ gameandgrade %>%
   theme_minimal()
 ```
 
+```{r, echo=FALSE, include=FALSE}
+#Parent revenue vs. average scores
+gameOrNotGameGrades <- gameandgrade %>%
+  filter(`Parent Revenue` != "2") %>%
+  group_by(`Parent Revenue`) %>%
+  summarise(`Average Score` = mean(Grade, na.rm = TRUE))
+```
+
 ---
 
-Other stuff we need:
+```{r, echo=FALSE}
+#Vizualizing data found above
+gameandgrade %>%
+  group_by(`Parent Revenue`) %>%
+  summarise(averageScore = mean(`Grade`, na.rm = TRUE)) %>%
+  ggplot(aes(x = `Parent Revenue`, y = averageScore, fill = `Parent Revenue`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Parent Revenue influence on average score", x = "Parent Revenue", y = "Average Grades") +
+  theme_minimal()
+```
+
+---
+
+Other stuff I need:
 
 Add own images 
 
