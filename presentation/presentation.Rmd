@@ -1,6 +1,6 @@
 ---
 title: "Game and Grade"
-subtitle: "Do Video Games Impact Academic Performance"
+subtitle: "Do Video Games Impact Academic Performance?"
 author: "Carolyn Powers"
 institute: "Houghton University"
 date: "5/15/25"
@@ -47,28 +47,30 @@ style_xaringan(
 )
 ```
 
-<span style="color: white;">
+#Data Key
+
+<div style="color:white; font-size:24px;">
 Sex: The student's gender ('Female' or 'Male').
-<span style="color: white;">
-
+<br>
 School Code: The code representing the student's school, which is a unique identifier for each school.
-
+<br>
 Playing Years: The number of years the student has been playing games.
-
+<br>
 Playing Often: A rating of how often the student plays games, likely on a scale from 1 to 5.
-
+<br>
 Playing Hours: The number of hours the student spends playing games per day.
-
+<br>
 Playing Games: The number of types of games the student plays (e.g., 0: not playing games, 1: playing games).
-
+<br>
 Parent Revenue: The annual income of the student's family.
-
+<br>
 Father Education: The education level of the student's father.
-
+<br>
 Mother Education: The education level of the student's mother.
-
+<br>
 Grade: The student's academic grade.
-</span>
+</div>
+
 ---
 
 class: top, left
@@ -96,7 +98,7 @@ gameOrNotGameGrades <- gameandgrade %>%
   summarise(`Average Score` = mean(Grade, na.rm = TRUE))
 ```
 
-#Number of schools and their Grades
+#Average score based on games played
 
 ```{r, echo=FALSE}
 #Helpful code to make slides look better
@@ -113,7 +115,7 @@ averageScoreofSchools <- gameandgrade %>%
   summarize(`Average Score` = mean(Grade, na.rm = TRUE))
 ```
 
-#Number of schools and their Grades
+#Number of schools and their grades
 
 ```{r, echo=FALSE}
 #Adding slide coding, the average grade of students who play video games in their respective schools
@@ -148,19 +150,37 @@ gameandgrade %>%
 
 ---
 
-```{r, echo=FALSE}
+#Girls and Boys average score
+###0 Represents Boys, 1 Represents Girls
+
+```{r, echo=FALSE, include=FALSE}
 #Boys play more on average
-gameandgrade %>%
+whichGenderPlaysMore <- gameandgrade %>%
   group_by(`Sex`) %>%
-  summarise(averageScore = mean(`Playing Hours`, na.rm = TRUE))
+  summarise(`Average Daily Hours` = mean(`Playing Hours`, na.rm = TRUE))
 ```
 
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, include=FALSE}
 #Girls on average have a higher Grade score
-gameandgrade %>%
+averageScoreByGender <- gameandgrade %>%
   group_by(`Sex`) %>%
-  summarise(averageScore = mean(`Grade`, na.rm = TRUE))
+  summarise(`Average Score` = mean(`Grade`, na.rm = TRUE))
 ```
+
+.pull-left[
+```{r, echo=FALSE}
+#knitr code making slide look better 
+knitr::kable(whichGenderPlaysMore, align = 'l')
+```
+]
+
+.pull-right[
+```{r, echo=FALSE}
+#
+knitr::kable(averageScoreByGender, align = 'l')
+```
+]
 
 ---
 
@@ -178,7 +198,7 @@ gameandgrade <- gameandgrade %>%
 mutate(combinedParentEduc = `Father Education` + `Mother Education`)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, include = FALSE}
 #Violin Chart
 gameandgrade %>%
   group_by(combinedParentEduc) %>%
@@ -188,8 +208,6 @@ gameandgrade %>%
   labs(title = "1", x = "2", y = "3")
 ```
 
----
-
 ```{r, echo=FALSE}
 #Bar Graph2
 gameandgrade %>%
@@ -198,7 +216,7 @@ gameandgrade %>%
   summarise(averageScore = mean(`Grade`, na.rm = TRUE)) %>%
   ggplot(aes(x = combinedParentEduc, y = averageScore, fill = combinedParentEduc)) +
   geom_bar(stat = "identity") +
-  labs(title = "Average Score based on hours played per day", x = "Combined Parent Education Score", y = "Average Grades") +
+  labs(title = "Average Score based on parent education", x = "Combined Parent Education Score", y = "Average Grades") +
   theme_minimal()
 ```
  
@@ -239,18 +257,6 @@ gameandgrade %>%
 
 ---
 
-Other stuff I need:
-
-Add own images 
-
-fix slides (knitr::kable) makes them pretty 
-
-game and grade average score of schools 
-
-make more slides 
-
-fix outlier lines 138-147
-
-
-Works Cited
-Games and success in students. (2025, February 19). Kaggle. https://www.kaggle.com/datasets/deadier/play-games-and-success-in-students
+#Works Cited: (See citation in README.md)
+###Games and success in students. (2025, February 19). Kaggle.
+https://www.kaggle.com/datasets/deadier/play-games-and-success-in-students
